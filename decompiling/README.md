@@ -9,7 +9,7 @@ using [keytool](https://stackoverflow.com/questions/11308077/generate-key-and-ce
 ```fish
 java -jar apktool_2.6.1.jar d reddit.apk -r
 ```
-6. Open your text editor of choice in the new directory `reddit` and edit away
+6. Open your text editor of choice in the new directory `reddit` and edit away, I recommend using [jadx-gui](https://github.com/skylot/jadx/releases) for finding stuff to edit.
 7. Compile the app again using the following command
 ```fish
 java -jar apktool_2.6.1.jar b reddit/ --use-aapt2
