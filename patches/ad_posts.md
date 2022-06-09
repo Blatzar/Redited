@@ -12,6 +12,8 @@ We can edit the Duplicates filter to also filter out promoted posts :)
 
 Seach for `RemoveDuplicatesFilter.kt` it will contain a single method which filters out posts, edit it like this:
 
+(_Note: Another patch below this code_)
+
 ```smali
 # virtual methods
 .method public b(Ljava/util/List;LTf/l;)Ljava/util/List;
@@ -150,6 +152,95 @@ Seach for `RemoveDuplicatesFilter.kt` it will contain a single method which filt
     goto :goto_1
 
     :cond_5
+    return-object p1
+.end method
+```
+
+Reddit also inserts ads in to the feed when you click on posts, to disable this edit `InFeedAdDuFilters.kt`. Remove everything in line 1-2 besides :labels
+
+```smali
+.method public final a(Ljava/util/List;Lgz/j;)Ljava/util/List;
+    .locals 2
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Ljava/util/List<",
+            "+TT;>;",
+            "Lgz/j<",
+            "TT;>;)",
+            "Ljava/util/List<",
+            "TT;>;"
+        }
+    .end annotation
+
+    const-string p2, "items"
+
+    invoke-static {p1, p2}, Ls42/j;->f(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 1
+    # iget-object p2, p0, Lly/b;->a:Lcom/reddit/session/o;
+
+    # invoke-interface {p2}, Lzj1/c;->d()Z
+
+    # move-result p2
+
+    # if-eqz p2, :cond_0
+
+    # return-object p1
+
+    .line 2
+    :cond_0
+    # iget-object p2, p0, Lly/b;->b:Lb00/b;
+
+    # invoke-interface {p2}, Lb00/b;->g()Z
+
+    # move-result p2
+
+    # if-eqz p2, :cond_3
+
+    .line 3
+    new-instance p2, Ljava/util/ArrayList;
+
+    invoke-direct {p2}, Ljava/util/ArrayList;-><init>()V
+
+    .line 4
+    invoke-interface {p1}, Ljava/lang/Iterable;->iterator()Ljava/util/Iterator;
+
+    move-result-object p1
+
+    :cond_1
+    :goto_0
+    invoke-interface {p1}, Ljava/util/Iterator;->hasNext()Z
+
+    move-result v0
+
+    if-eqz v0, :cond_2
+
+    invoke-interface {p1}, Ljava/util/Iterator;->next()Ljava/lang/Object;
+
+    move-result-object v0
+
+    move-object v1, v0
+
+    check-cast v1, Lcom/reddit/domain/model/ILink;
+
+    .line 5
+    invoke-virtual {v1}, Lcom/reddit/domain/model/ILink;->getPromoted()Z
+
+    move-result v1
+
+    xor-int/lit8 v1, v1, 0x1
+
+    if-eqz v1, :cond_1
+
+    invoke-virtual {p2, v0}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+
+    goto :goto_0
+
+    :cond_2
+    move-object p1, p2
+
+    :cond_3
     return-object p1
 .end method
 ```
