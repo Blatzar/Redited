@@ -6,7 +6,104 @@ Ad posts are baked in the normal post requests so to remove post ads one needs t
 To break the ad posts simply rename all occurances of `"AdPost"` to something else (*keep the quoutation marks though*),
 this will remove all ad posts in the main feed, but does not remove posts in the custom feeds :(
 
-### Method 2
+### Method 2 (Blocks all post ads afaik)
+
+All posts are stored in listables, if you can filter the posts when they get put in those listables you can remove all ad posts.
+I wrote some custom smali to filter all posts marked as promoted, in `Listing.smali` (search for `.class public final Lcom/reddit/domain/model/listing/Listing;`)
+
+Edit the contructor like this:
+```smali
+.method public constructor <init>(Ljava/util/List;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)V
+    .locals 4
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Ljava/util/List<",
+            "+TT;>;",
+            "Ljava/lang/String;",
+            "Ljava/lang/String;",
+            "Ljava/lang/String;",
+            "Ljava/lang/String;",
+            "Z)V"
+        }
+    .end annotation
+
+    const-string v0, "children"
+
+    invoke-static {p1, v0}, Lc32/k;->f(Ljava/lang/Object;Ljava/lang/String;)V
+
+    .line 1
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    .line 2
+    # START HERE, ALL ABOVE SHOULD BE UNTOUCHED CODE YOU DECOMPILED EXCEPT .locals 4 AT THE TOP
+    # p1 is the original list
+    check-cast p1, Ljava/lang/Iterable;
+
+    # v1 = new ArrayList();
+    new-instance v1, Ljava/util/ArrayList;
+    invoke-direct {v1}, Ljava/util/ArrayList;-><init>()V
+    check-cast v1, Ljava/util/Collection;
+
+    invoke-interface {p1}, Ljava/lang/Iterable;->iterator()Ljava/util/Iterator;
+
+    # v3 = list.iterator();
+    move-result-object v3
+
+    :continue
+
+    # v2 = iterator.hasNext()
+    invoke-interface {v3}, Ljava/util/Iterator;->hasNext()Z
+    move-result v2
+
+    # Exit loop if no next
+    if-eqz v2, :exit_loop
+
+    invoke-interface {v3}, Ljava/util/Iterator;->next()Ljava/lang/Object;
+    # v2 = iterator.next()
+    move-result-object v2
+
+    # ILink
+    instance-of v0, v2, Lcom/reddit/domain/model/ILink;
+    if-eqz v0, :afterLink
+
+    # ---------------------------------------
+    check-cast v2, Lcom/reddit/domain/model/ILink;
+    
+    # if (getPromoted()) continue 
+    invoke-virtual {v2}, Lcom/reddit/domain/model/ILink;->getPromoted()Z
+    move-result v0
+    if-nez v0, :continue
+    # ---------------------------------------
+    :afterLink
+
+    # Add any object which survives the check and continue the loop
+    invoke-interface {v1, v2}, Ljava/util/Collection;->add(Ljava/lang/Object;)Z
+    goto :continue
+    :exit_loop
+    iput-object v1, p0, Lcom/reddit/domain/model/listing/Listing;->children:Ljava/util/List;
+    # END OF EDITING
+    
+    .line 3
+    iput-object p2, p0, Lcom/reddit/domain/model/listing/Listing;->after:Ljava/lang/String;
+
+    .line 4
+    iput-object p3, p0, Lcom/reddit/domain/model/listing/Listing;->before:Ljava/lang/String;
+
+    .line 5
+    iput-object p4, p0, Lcom/reddit/domain/model/listing/Listing;->adDistance:Ljava/lang/String;
+
+    .line 6
+    iput-object p5, p0, Lcom/reddit/domain/model/listing/Listing;->geoFilter:Ljava/lang/String;
+
+    .line 7
+    iput-boolean p6, p0, Lcom/reddit/domain/model/listing/Listing;->hasRecommendations:Z
+
+    return-void
+.end method
+```
+
+### Method 3 (Some ads slip through when scrolling horizontally)
 
 We can edit the Duplicates filter to also filter out promoted posts :)
 
