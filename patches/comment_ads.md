@@ -5,7 +5,7 @@
 
 Search for `Error loading comment ads` in the whole project, the file should have `.source "RedditCommentsPageAdRepository.kt"` in the top.
 
-In the same function as `Error loading comment ads` is located in return null, like what's shown below.
+In the same function as `Error loading comment ads` or `Error loading comments page ad` is located in return null, like what's shown below.
 ```smali
 # virtual methods
 .method public a(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLwS/d;)Ljava/lang/Object;
