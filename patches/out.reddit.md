@@ -1,5 +1,7 @@
 Reddit tracks the links you open with a redirect to out.reddit.com. This patch bypasses the redirect without visiting the site.
 
+**NOTE:** This will not bypass opening links from comments!
+
 Search for ```.class public final Lcom/reddit/domain/model/OutboundLink;```
 
 Replace the getUrl method in the same file with this:
