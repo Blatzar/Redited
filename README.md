@@ -1,4 +1,7 @@
 # Redited
+
+## All the patches have been ported to [ReVanced](https://revanced.app/) and this projected is no longer maintained.
+
 Edited Reddit to remove ads, steps included so you could do this at home :)
 
 [Downloads here](https://github.com/Blatzar/Redited/releases) (Click assets)
